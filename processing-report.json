@@ -1,0 +1,52 @@
+{
+  "summary": {
+    "totalSlides": 121,
+    "totalTime": 278,
+    "principlesApplied": 2,
+    "patternsUsed": 15,
+    "processingTime": 1754206512,
+    "qualityScore": 80
+  },
+  "stages": {
+    "ideaAnalysis": "completed",
+    "draftStructure": "completed",
+    "patternSelection": "completed",
+    "marpGeneration": "completed",
+    "htmlConversion": "completed"
+  },
+  "issues": {
+    "errors": [],
+    "warnings": [
+      {
+        "stage": 1,
+        "code": "INCOMPLETE_FRAMEWORK",
+        "message": "Critical thinking framework is incomplete"
+      },
+      {
+        "stage": 2,
+        "code": "STRUCTURE_RECOMMENDATION",
+        "message": "セクション数が多すぎます。統合を検討してください"
+      },
+      {
+        "stage": 3,
+        "code": "PATTERN_WARNING",
+        "message": "34個のセクションでパターン選択の信頼度が低くなっています。代替案を検討してください。"
+      },
+      {
+        "stage": 3,
+        "code": "LOW_CONFIDENCE_PATTERNS",
+        "message": "34 pattern mappings have low confidence scores"
+      },
+      {
+        "stage": 4,
+        "code": "LONG_SLIDES",
+        "message": "8 slides may be too long and could benefit from splitting"
+      }
+    ]
+  },
+  "recommendations": [
+    "多数の警告が発生しました。コンテンツの品質向上を検討してください。",
+    "スライド数が多すぎます。内容の簡潔化を検討してください。",
+    "プレゼンテーション時間が長すぎます。重要なポイントに絞り込むことを推奨します。"
+  ]
+}

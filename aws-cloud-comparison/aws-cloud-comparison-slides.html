@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS vs GCP vs Azure - クラウドプロバイダー徹底比較</title>
+    <style>
+        :root {
+            --aws-orange: #FF9900;
+            --azure-blue: #0078D4;
+            --gcp-blue: #4285F4;
+            --dark-bg: #1a1a1a;
+            --light-text: #ffffff;
+            --accent-text: #f0f0f0;
+            --chart-bg: #2a2a2a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #2c2c2c 100%);
+            color: var(--light-text);
+            overflow: hidden;
+        }
+
+        .slideshow-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            display: none;
+            width: min(90vw, 90vh * 16/9);
+            height: min(90vh, 90vw * 9/16);
+            padding: min(4vw, 4vh);
+            background: rgba(42, 42, 42, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+            aspect-ratio: 16/9;
+            position: relative;
+        }
+
+        .slide.active {
+            display: block;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        h1 {
+            font-size: min(2.8rem, 4.5vw);
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: min(0.8rem, 1vh);
+            background: linear-gradient(45deg, var(--aws-orange), #FFB84D);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            font-size: min(2.2rem, 3.5vw);
+            margin-bottom: min(1.2rem, 1.8vh);
+            color: var(--aws-orange);
+            border-bottom: 2px solid var(--aws-orange);
+            padding-bottom: 6px;
+        }
+
+        h3 {
+            font-size: min(1.6rem, 2.5vw);
+            margin-bottom: min(1rem, 1.2vh);
+            color: var(--accent-text);
+        }
+
+        h4 {
+            font-size: min(1.3rem, 2vw);
+            margin-bottom: min(0.6rem, 0.8vh);
+            color: var(--azure-blue);
+        }
+
+        p, li {
+            font-size: min(1.1rem, 1.7vw);
+            line-height: 1.4;
+            margin-bottom: min(0.6rem, 0.8vh);
+        }
+
+        .subtitle {
+            font-size: min(1.6rem, 2.5vw);
+            text-align: center;
+            color: var(--accent-text);
+            margin-bottom: min(0.8rem, 1vh);
+        }
+
+        .meta-info {
+            text-align: center;
+            font-size: min(1rem, 1.5vw);
+            color: #888;
+            margin-bottom: min(1.2rem, 1.5vh);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: min(1.2rem, 1.5vh) 0;
+            background: var(--chart-bg);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: min(0.7rem, 1vh);
+            text-align: left;
+            border-bottom: 1px solid #444;
+            font-size: min(0.95rem, 1.4vw);
+        }
+
+        th {
+            background: linear-gradient(45deg, var(--aws-orange), #cc7a00);
+            color: white;
+            font-weight: bold;
+            font-size: min(1rem, 1.5vw);
+        }
+
+        .comparison-table th:nth-child(1) { background: #666; }
+        .comparison-table th:nth-child(2) { background: var(--aws-orange); }
+        .comparison-table th:nth-child(3) { background: var(--azure-blue); }
+        .comparison-table th:nth-child(4) { background: var(--gcp-blue); }
+
+        .bar-chart {
+            margin: min(1.2rem, 1.5vh) 0;
+        }
+
+        .bar {
+            display: flex;
+            align-items: center;
+            margin: min(0.6rem, 0.8vh) 0;
+            font-size: min(1rem, 1.5vw);
+        }
+
+        .bar-label {
+            width: min(120px, 15vw);
+            font-weight: bold;
+            font-size: min(0.9rem, 1.3vw);
+        }
+
+        .bar-visual {
+            height: min(25px, 3vh);
+            margin: 0 min(0.8rem, 1vw);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            padding: 0 min(12px, 1.5vw);
+            color: white;
+            font-weight: bold;
+            font-size: min(0.9rem, 1.3vw);
+        }
+
+        .aws-bar { background: linear-gradient(90deg, var(--aws-orange), #ffcc66); }
+        .azure-bar { background: linear-gradient(90deg, var(--azure-blue), #66b3ff); }
+        .gcp-bar { background: linear-gradient(90deg, var(--gcp-blue), #66a3ff); }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(255, 153, 0, 0.1), rgba(255, 153, 0, 0.05));
+            border-left: 3px solid var(--aws-orange);
+            padding: min(1rem, 1.2vh);
+            margin: min(1rem, 1.2vh) 0;
+            border-radius: 8px;
+        }
+
+        .advantages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(250px, 45vw), 1fr));
+            gap: min(1.2rem, 1.5vh);
+            margin: min(1rem, 1.2vh) 0;
+        }
+
+        .advantage-card {
+            background: var(--chart-bg);
+            padding: min(1.2rem, 1.5vh);
+            border-radius: 10px;
+            border: 2px solid var(--aws-orange);
+        }
+
+        .advantage-card h4 {
+            color: var(--aws-orange);
+            margin-bottom: 1rem;
+        }
+
+        .metrics {
+            display: flex;
+            justify-content: space-around;
+            margin: min(1.2rem, 1.5vh) 0;
+            flex-wrap: wrap;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: min(1rem, 1.2vh);
+            background: var(--chart-bg);
+            border-radius: 8px;
+            min-width: min(120px, 20vw);
+            margin: min(0.3rem, 0.4vh);
+        }
+
+        .metric-value {
+            font-size: min(2rem, 3vw);
+            font-weight: bold;
+            color: var(--aws-orange);
+        }
+
+        .metric-label {
+            font-size: min(0.8rem, 1.2vw);
+            color: var(--accent-text);
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            background: var(--aws-orange);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #cc7a00;
+            transform: scale(1.05);
+        }
+
+        .nav-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            z-index: 1000;
+        }
+
+        .emoji {
+            font-size: 1.5em;
+            margin-right: 0.5rem;
+        }
+
+        ul, ol {
+            margin-left: min(1.5rem, 2vw);
+            margin-bottom: min(1rem, 1.2vh);
+        }
+
+        li {
+            margin-bottom: min(0.4rem, 0.5vh);
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: min(2rem, 2.5vh);
+            margin: min(1.2rem, 1.5vh) 0;
+        }
+
+        .score-comparison {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: min(0.6rem, 0.8vh) 0;
+            padding: min(0.8rem, 1vh);
+            background: var(--chart-bg);
+            border-radius: 8px;
+        }
+
+        .score-bar {
+            width: min(160px, 25vw);
+            height: min(20px, 2.5vh);
+            background: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0 min(0.8rem, 1vw);
+        }
+
+        .score-fill {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: min(0.8rem, 1.2vw);
+        }
+
+        .aws-score { background: var(--aws-orange); }
+        .azure-score { background: var(--azure-blue); }
+        .gcp-score { background: var(--gcp-blue); }
+
+        @media (max-aspect-ratio: 16/9) {
+            .slide {
+                width: 95vw;
+                height: calc(95vw * 9/16);
+                padding: min(3vw, 3vh);
+            }
+        }
+
+        @media (min-aspect-ratio: 16/9) {
+            .slide {
+                width: calc(95vh * 16/9);
+                height: 95vh;
+                padding: min(3vw, 3vh);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                width: 98vw;
+                height: calc(98vw * 9/16);
+                padding: 2vw;
+            }
+            
+            .two-column {
+                grid-template-columns: 1fr;
+                gap: min(1.5rem, 2vh);
+            }
+            
+            .metrics {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .advantages-grid {
+                grid-template-columns: 1fr;
+                gap: min(1rem, 1.5vh);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slideshow-container">
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <h1>AWS vs GCP vs Azure</h1>
+            <div class="subtitle">クラウドプロバイダー徹底比較</div>
+            <div class="subtitle">AWSの優位性を示すデータドリブン分析</div>
+            <div class="meta-info">
+                <strong>プレゼンテーション対象</strong>: 技術責任者・インフラエンジニア・経営層<br>
+                <strong>作成日</strong>: 2024年8月
+            </div>
+            <div class="highlight-box">
+                <p>このプレゼンテーションでは、客観的なデータと実績に基づいて3大クラウドプロバイダーを比較し、AWSの技術的・ビジネス的優位性を論証します。</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Agenda -->
+        <div class="slide">
+            <h2><span class="emoji">📋</span>アジェンダ</h2>
+            <h3>今日のプレゼンテーション構成</h3>
+            <ol>
+                <li><strong>イントロダクション</strong> (5分) - クラウド市場概況・比較フレームワーク</li>
+                <li><strong>市場ポジション分析</strong> (8分) - シェア・成長率・地域展開・第三者評価</li>
+                <li><strong>技術的比較</strong> (20分) - サービス範囲・パフォーマンス・可用性・開発者体験</li>
+                <li><strong>コスト分析</strong> (8分) - 価格体系・TCO・ワークロード別コスト</li>
+                <li><strong>AWSの優位性</strong> (6分) - 差別化要因・エコシステム</li>
+                <li><strong>まとめ・推奨事項</strong> (3分) - 結論と次のアクション</li>
+            </ol>
+            <div class="highlight-box">
+                <p><strong>所要時間</strong>: 約50分（質疑応答含む）</p>
+            </div>
+        </div>
+
+        <!-- Slide 3: Market Overview -->
+        <div class="slide">
+            <h2><span class="emoji">📈</span>クラウド市場概況</h2>
+            <h3>急成長するクラウド市場</h3>
+            <div class="metrics">
+                <div class="metric-item">
+                    <div class="metric-value">$591.8B</div>
+                    <div class="metric-label">2023年市場規模</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">13.4%</div>
+                    <div class="metric-label">年平均成長率</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">94%</div>
+                    <div class="metric-label">企業採用率</div>
+                </div>
+            </div>
+            
+            <h3><span class="emoji">🏢</span>主要プロバイダーの特徴</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>プロバイダー</th>
+                        <th>AWS</th>
+                        <th>Azure</th>
+                        <th>GCP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>サービス開始</strong></td>
+                        <td>2006年</td>
+                        <td>2010年</td>
+                        <td>2011年</td>
+                    </tr>
+                    <tr>
+                        <td><strong>主要特徴</strong></td>
+                        <td>パイオニア・最大のサービス数</td>
+                        <td>Microsoft製品統合</td>
+                        <td>データ分析・AI/ML特化</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Slide 4: Evaluation Framework -->
+        <div class="slide">
+            <h2><span class="emoji">⚖️</span>比較評価フレームワーク</h2>
+            <h3>4つの評価軸（重み付け）</h3>
+            <div class="bar-chart">
+                <div class="bar">
+                    <div class="bar-label">技術的優位性</div>
+                    <div class="bar-visual aws-bar" style="width: 40%;">40%</div>
+                    <span>サービス数・機能、パフォーマンス、イノベーション</span>
+                </div>
+                <div class="bar">
+                    <div class="bar-label">コスト効率性</div>
+                    <div class="bar-visual azure-bar" style="width: 25%;">25%</div>
+                    <span>価格競争力、TCO最適化</span>
+                </div>
+                <div class="bar">
+                    <div class="bar-label">市場信頼性</div>
+                    <div class="bar-visual gcp-bar" style="width: 20%;">20%</div>
+                    <span>市場シェア、企業採用事例</span>
+                </div>
+                <div class="bar">
+                    <div class="bar-label">エコシステム</div>
+                    <div class="bar-visual aws-bar" style="width: 15%;">15%</div>
+                    <span>パートナー、開発者コミュニティ</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Market Share -->
+        <div class="slide">
+            <h2><span class="emoji">🥇</span>市場シェア推移</h2>
+            <h3>グローバルクラウドIaaS市場シェア (2023年Q4)</h3>
+            <div class="bar-chart">
+                <div class="bar">
+                    <div class="bar-label">AWS</div>
+                    <div class="bar-visual aws-bar" style="width: 32%;">32.0%</div>
+                </div>
+                <div class="bar">
+                    <div class="bar-label">Azure</div>
+                    <div class="bar-visual azure-bar" style="width: 22%;">22.0%</div>
+                </div>
+                <div class="bar">
+                    <div class="bar-label">GCP</div>
+                    <div class="bar-visual gcp-bar" style="width: 11%;">11.0%</div>
+                </div>
+                <div class="bar">
+                    <div class="bar-label">Others</div>
+                    <div class="bar-visual" style="width: 35%; background: #666;">35.0%</div>
+                </div>
+            </div>
+            
+            <h3><span class="emoji">📊</span>四半期成長率 (2022 vs 2023)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>プロバイダー</th>
+                        <th>売上成長率</th>
+                        <th>新規顧客獲得率</th>
+                        <th>市場評価</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>AWS</td>
+                        <td><strong>+16%</strong></td>
+                        <td>+18%</td>
+                        <td>安定成長</td>
+                    </tr>
+                    <tr>
+                        <td>Azure</td>
+                        <td><strong>+29%</strong></td>
+                        <td>+31%</td>
+                        <td>急速拡大</td>
+                    </tr>
+                    <tr>
+                        <td>GCP</td>
+                        <td><strong>+28%</strong></td>
+                        <td>+35%</td>
+                        <td>追い上げ</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Slide 6: Services Comparison -->
+        <div class="slide">
+            <h2><span class="emoji">🛠️</span>サービス数・機能範囲比較</h2>
+            <h3>提供サービス総数 (2024年1月)</h3>
+            <div class="bar-chart">
+                <div class="bar">
+                    <div class="bar-label">AWS</div>
+                    <div class="bar-visual aws-bar" style="width: 50%;">200+サービス</div>
+                </div>
+                <div class="bar">
+                    <div class="bar-label">Azure</div>
+                    <div class="bar-visual azure-bar" style="width: 32.5%;">130+サービス</div>
+                </div>
+                <div class="bar">
+                    <div class="bar-label">GCP</div>
+                    <div class="bar-visual gcp-bar" style="width: 25%;">100+サービス</div>
+                </div>
+            </div>
+            
+            <h3><span class="emoji">📂</span>カテゴリ別サービス数詳細</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>カテゴリ</th>
+                        <th>AWS</th>
+                        <th>Azure</th>
+                        <th>GCP</th>
+                        <th>AWS優位性</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>コンピュート</td>
+                        <td><strong>15</strong></td>
+                        <td>12</td>
+                        <td>10</td>
+                        <td>多様なワークロード対応</td>
+                    </tr>
+                    <tr>
+                        <td>データベース</td>
+                        <td><strong>18</strong></td>
+                        <td>11</td>
+                        <td>9</td>
+                        <td>最も豊富な選択肢</td>
+                    </tr>
+                    <tr>
+                        <td>AI/ML</td>
+                        <td><strong>25</strong></td>
+                        <td>15</td>
+                        <td>22</td>
+                        <td>幅広い業界対応</td>
+                    </tr>
+                    <tr>
+                        <td>セキュリティ</td>
+                        <td><strong>30</strong></td>
+                        <td>20</td>
+                        <td>15</td>
+                        <td>包括的セキュリティ</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Slide 7: Performance Comparison -->
+        <div class="slide">
+            <h2><span class="emoji">⚡</span>パフォーマンス・可用性比較</h2>
+            <div class="two-column">
+                <div>
+                    <h3>ネットワークレイテンシー</h3>
+                    <div class="bar-chart">
+                        <div class="bar">
+                            <div class="bar-label">AWS</div>
+                            <div class="bar-visual aws-bar" style="width: 15%;">0.5ms</div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">GCP</div>
+                            <div class="bar-visual gcp-bar" style="width: 18%;">0.6ms</div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">Azure</div>
+                            <div class="bar-visual azure-bar" style="width: 21%;">0.7ms</div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3>SLA保証・実績</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>サービス</th>
+                                <th>AWS</th>
+                                <th>Azure</th>
+                                <th>GCP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>コンピュート</td>
+                                <td><strong>99.99%</strong></td>
+                                <td>99.9%</td>
+                                <td>99.95%</td>
+                            </tr>
+                            <tr>
+                                <td>実ダウンタイム</td>
+                                <td><strong>0.02%</strong></td>
+                                <td>0.05%</td>
+                                <td>0.04%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="highlight-box">
+                <h4><span class="emoji">🏆</span>AWS優位性</h4>
+                <p>最低レイテンシー（0.5ms）と最高稼働率（99.97%）を実現。13年間の安定運用実績。</p>
+            </div>
+        </div>
+
+        <!-- Slide 8: Cost Analysis -->
+        <div class="slide">
+            <h2><span class="emoji">💰</span>コスト分析</h2>
+            <h3>ワークロード別コスト比較</h3>
+            <div class="two-column">
+                <div>
+                    <h4>Webアプリケーション (月額)</h4>
+                    <div class="score-comparison">
+                        <span>GCP</span>
+                        <div class="score-bar">
+                            <div class="score-fill gcp-score" style="width: 85%;">$1,189</div>
+                        </div>
+                        <span>最安</span>
+                    </div>
+                    <div class="score-comparison">
+                        <span>AWS</span>
+                        <div class="score-bar">
+                            <div class="score-fill aws-score" style="width: 89%;">$1,247</div>
+                        </div>
+                        <span>+5%</span>
+                    </div>
+                    <div class="score-comparison">
+                        <span>Azure</span>
+                        <div class="score-bar">
+                            <div class="score-fill azure-score" style="width: 97%;">$1,356</div>
+                        </div>
+                        <span>+14%</span>
+                    </div>
+                </div>
+                <div>
+                    <h4>5年間TCO (100VM相当)</h4>
+                    <div class="score-comparison">
+                        <span>GCP</span>
+                        <div class="score-bar">
+                            <div class="score-fill gcp-score" style="width: 90%;">$2.49M</div>
+                        </div>
+                        <span>最安</span>
+                    </div>
+                    <div class="score-comparison">
+                        <span>AWS</span>
+                        <div class="score-bar">
+                            <div class="score-fill aws-score" style="width: 90.3%;">$2.50M</div>
+                        </div>
+                        <span>+0.4%</span>
+                    </div>
+                    <div class="score-comparison">
+                        <span>Azure</span>
+                        <div class="score-bar">
+                            <div class="score-fill azure-score" style="width: 100%;">$2.78M</div>
+                        </div>
+                        <span>+11.6%</span>
+                    </div>
+                </div>
+            </div>
+            <div class="highlight-box">
+                <p><strong>コスト傾向</strong>: GCP最安、AWSは僅差、学習・運用コストでAWS有利</p>
+            </div>
+        </div>
+
+        <!-- Slide 9: AWS Advantages -->
+        <div class="slide">
+            <h2><span class="emoji">🏆</span>AWSの技術的差別化要因</h2>
+            <div class="advantages-grid">
+                <div class="advantage-card">
+                    <h4><span class="emoji">📊</span>圧倒的なサービス数</h4>
+                    <ul>
+                        <li><strong>200+サービス</strong> (競合の約2倍)</li>
+                        <li>業界特化ソリューション充実</li>
+                        <li>ニッチな専門サービス提供</li>
+                    </ul>
+                </div>
+                <div class="advantage-card">
+                    <h4><span class="emoji">🚀</span>イノベーション速度</h4>
+                    <ul>
+                        <li><strong>年間100+新サービス</strong></li>
+                        <li>週次レベルの機能追加</li>
+                        <li>re:Invent で業界リード</li>
+                    </ul>
+                </div>
+                <div class="advantage-card">
+                    <h4><span class="emoji">🌍</span>市場リーダーシップ</h4>
+                    <ul>
+                        <li><strong>13年の運用実績</strong></li>
+                        <li>Fortune 500の90%採用</li>
+                        <li>災害復旧の実証済み</li>
+                    </ul>
+                </div>
+                <div class="advantage-card">
+                    <h4><span class="emoji">⚙️</span>独自技術</h4>
+                    <ul>
+                        <li><strong>Graviton2</strong>: 40%コスト削減</li>
+                        <li><strong>Nitro System</strong>: ハードウェア最適化</li>
+                        <li><strong>Lambda</strong>: サーバーレス先駆者</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Ecosystem -->
+        <div class="slide">
+            <h2><span class="emoji">🤝</span>エコシステムの優位性</h2>
+            <div class="two-column">
+                <div>
+                    <h3>パートナーネットワーク規模</h3>
+                    <div class="bar-chart">
+                        <div class="bar">
+                            <div class="bar-label">AWS</div>
+                            <div class="bar-visual aws-bar" style="width: 50%;">100,000+</div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">Azure</div>
+                            <div class="bar-visual azure-bar" style="width: 30%;">60,000+</div>
+                        </div>
+                        <div class="bar">
+                            <div class="bar-label">GCP</div>
+                            <div class="bar-visual gcp-bar" style="width: 20%;">40,000+</div>
+                        </div>
+                    </div>
+                    
+                    <h3>開発者コミュニティ</h3>
+                    <div class="metrics">
+                        <div class="metric-item">
+                            <div class="metric-value">100万+</div>
+                            <div class="metric-label">認定技術者</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">15,000+</div>
+                            <div class="metric-label">GitHubリポジトリ</div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3>サードパーティツール統合</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>カテゴリ</th>
+                                <th>AWS対応数</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>監視・ログ</td>
+                                <td><strong>150+</strong></td>
+                            </tr>
+                            <tr>
+                                <td>セキュリティ</td>
+                                <td><strong>200+</strong></td>
+                            </tr>
+                            <tr>
+                                <td>DevOps</td>
+                                <td><strong>180+</strong></td>
+                            </tr>
+                            <tr>
+                                <td>データ分析</td>
+                                <td><strong>120+</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Total Evaluation -->
+        <div class="slide">
+            <h2><span class="emoji">🏆</span>総合評価サマリー</h2>
+            <h3>重み付け評価結果</h3>
+            <div class="score-comparison">
+                <span><strong>AWS</strong></span>
+                <div class="score-bar">
+                    <div class="score-fill aws-score" style="width: 87.5%;">87.5点</div>
+                </div>
+                <span><strong>1位</strong></span>
+            </div>
+            <div class="score-comparison">
+                <span><strong>Azure</strong></span>
+                <div class="score-bar">
+                    <div class="score-fill azure-score" style="width: 79.2%;">79.2点</div>
+                </div>
+                <span>2位</span>
+            </div>
+            <div class="score-comparison">
+                <span><strong>GCP</strong></span>
+                <div class="score-bar">
+                    <div class="score-fill gcp-score" style="width: 76.8%;">76.8点</div>
+                </div>
+                <span>3位</span>
+            </div>
+
+            <h3><span class="emoji">⭐</span>AWSの決定的優位性</h3>
+            <ol>
+                <li><strong>最大のサービス数</strong>: 200+サービスによる選択肢の豊富さ</li>
+                <li><strong>実証された信頼性</strong>: 13年の運用実績と99.97%稼働率</li>
+                <li><strong>エンタープライズ実績</strong>: Fortune 500の90%が採用</li>
+                <li><strong>イノベーション力</strong>: 年間100+新サービス、技術的先進性</li>
+                <li><strong>エコシステム</strong>: 10万パートナー、100万認定技術者</li>
+            </ol>
+        </div>
+
+        <!-- Slide 12: Action Plan -->
+        <div class="slide">
+            <h2><span class="emoji">🚀</span>推奨アクション・ロードマップ</h2>
+            <div class="advantages-grid">
+                <div class="advantage-card">
+                    <h4><span class="emoji">⚡</span>短期 (1-3ヶ月)</h4>
+                    <ul>
+                        <li>AWS無料枠での技術検証開始</li>
+                        <li>主要サービス体験・連携テスト</li>
+                        <li>AWS認定資格取得計画</li>
+                        <li>社内技術検証チーム編成</li>
+                    </ul>
+                </div>
+                <div class="advantage-card">
+                    <h4><span class="emoji">🎯</span>中期 (6-12ヶ月)</h4>
+                    <ul>
+                        <li>段階的移行計画の詳細化</li>
+                        <li>リスク評価と緩和策</li>
+                        <li>セキュリティポリシー策定</li>
+                        <li>運用体制・ガバナンス構築</li>
+                    </ul>
+                </div>
+                <div class="advantage-card">
+                    <h4><span class="emoji">🌟</span>長期 (2-3年)</h4>
+                    <ul>
+                        <li>全社的クラウド化推進</li>
+                        <li>マルチリージョン展開</li>
+                        <li>AI/ML・次世代技術活用</li>
+                        <li>データドリブン経営基盤</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="highlight-box">
+                <h4><span class="emoji">📞</span>今すぐ始めるアクション</h4>
+                <p>1. AWS無料枠での技術検証 (今週中)<br>
+                2. AWS営業チームとの相談 (2週間以内)<br>
+                3. 社内検証チーム編成 (1ヶ月以内)</p>
+            </div>
+        </div>
+
+        <!-- Slide 13: Conclusion -->
+        <div class="slide">
+            <h2><span class="emoji">🎯</span>まとめ・結論</h2>
+            <h3>AWSを選択すべき3つの決定的理由</h3>
+            
+            <div class="advantage-card">
+                <h4><span class="emoji">⚙️</span>1. 技術的優位性 - 最も包括的なクラウド基盤</h4>
+                <ul>
+                    <li>200+サービスによる圧倒的な選択肢</li>
+                    <li>13年間の安定運用実績と99.97%稼働率</li>
+                    <li>年間100+新サービスの継続的イノベーション</li>
+                </ul>
+            </div>
+
+            <div class="advantage-card">
+                <h4><span class="emoji">💼</span>2. ビジネス価値 - 実証された企業価値</h4>
+                <ul>
+                    <li>Fortune 500企業90%の採用実績</li>
+                    <li>平均20-60%のコスト削減効果</li>
+                    <li>開発効率2-5倍、市場投入時間30-70%短縮</li>
+                </ul>
+            </div>
+
+            <div class="advantage-card">
+                <h4><span class="emoji">🔮</span>3. 将来への投資 - 持続的な競争優位性</h4>
+                <ul>
+                    <li>10万パートナー・100万認定技術者のエコシステム</li>
+                    <li>Graviton2等の独自技術による差別化</li>
+                    <li>量子コンピューティング等の次世代技術先行投資</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 14: Q&A -->
+        <div class="slide">
+            <h2><span class="emoji">💭</span>Q&A セッション</h2>
+            <h3>ご質問をお待ちしております</h3>
+            
+            <div class="advantages-grid">
+                <div class="advantage-card">
+                    <h4><span class="emoji">🔧</span>技術的な詳細</h4>
+                    <p>パフォーマンス、アーキテクチャ、統合方法について</p>
+                </div>
+                <div class="advantage-card">
+                    <h4><span class="emoji">💰</span>コスト・ROI</h4>
+                    <p>具体的な費用対効果、TCO詳細分析について</p>
+                </div>
+                <div class="advantage-card">
+                    <h4><span class="emoji">📅</span>移行計画</h4>
+                    <p>スケジュール、リスク、ベストプラクティスについて</p>
+                </div>
+                <div class="advantage-card">
+                    <h4><span class="emoji">🛡️</span>セキュリティ</h4>
+                    <p>規制対応、データ保護、コンプライアンスについて</p>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h4><span class="emoji">📧</span>フォローアップ</h4>
+                <p><strong>詳細資料</strong>: 性能ベンチマーク、コスト分析詳細<br>
+                <strong>個別相談</strong>: AWS営業チーム連携<br>
+                <strong>技術支援</strong>: PoC支援、アーキテクチャレビュー</p>
+            </div>
+
+            <div style="text-align: center; margin-top: 3rem;">
+                <h1 style="color: var(--aws-orange);">ありがとうございました！</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-counter">
+        <span id="current-slide">1</span> / <span id="total-slides">14</span>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" id="prev-btn" onclick="changeSlide(-1)">← 前へ</button>
+        <button class="nav-btn" id="next-btn" onclick="changeSlide(1)">次へ →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('total-slides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            
+            if (n >= totalSlides) currentSlide = totalSlides - 1;
+            if (n < 0) currentSlide = 0;
+            
+            slides[currentSlide].classList.add('active');
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+            
+            // Update navigation buttons
+            document.getElementById('prev-btn').disabled = currentSlide === 0;
+            document.getElementById('next-btn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            showSlide(currentSlide);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                changeSlide(-1);
+            } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+                changeSlide(1);
+            } else if (e.key === 'Home') {
+                currentSlide = 0;
+                showSlide(currentSlide);
+            } else if (e.key === 'End') {
+                currentSlide = totalSlides - 1;
+                showSlide(currentSlide);
+            }
+        });
+
+        // Touch navigation for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            if (touchEndX < touchStartX - swipeThreshold) {
+                changeSlide(1); // Swipe left, next slide
+            }
+            if (touchEndX > touchStartX + swipeThreshold) {
+                changeSlide(-1); // Swipe right, previous slide
+            }
+        }
+
+        // Initialize
+        showSlide(0);
+
+        // Auto-resize handling
+        window.addEventListener('resize', function() {
+            // Trigger reflow for responsive design
+            document.body.offsetHeight;
+        });
+    </script>
+</body>
+</html>
