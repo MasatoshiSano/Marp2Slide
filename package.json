@@ -1,32 +1,6 @@
 {
   "name": "marp2slide",
   "version": "1.0.0",
-  "description": "Convert markdown files to interactive HTML slides through a 5-stage processing pipeline",
-  "type": "module",
-  "main": "src/index.js",
-  "scripts": {
-    "start": "node dist/example.js",
-    "dev": "tsx example.ts",
-    "build": "tsc",
-    "test": "node --test",
-    "quick": "tsx quick-start.ts"
-  },
-  "keywords": [
-    "markdown",
-    "slides",
-    "presentation",
-    "marp",
-    "html",
-    "slideshow"
-  ],
-  "author": "Marp2Slide System",
-  "license": "MIT",
-  "devDependencies": {
-    "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
-    "tsx": "^4.0.0"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  }
+  "description": "Simple markdown slide generation system",
+  "license": "MIT"
 }

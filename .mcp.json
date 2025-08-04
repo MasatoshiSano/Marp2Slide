@@ -1,0 +1,16 @@
+{
+  "servers": {
+    "context7": {
+      "package": "@anthropic-ai/context7",
+      "args": []
+    },
+    "playwright": {
+      "package": "@anthropic-ai/playwright",
+      "args": []
+    },
+    "serena": {
+      "package": "@anthropic-ai/serena",
+      "args": []
+    }
+  }
+}

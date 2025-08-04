@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>製造業メンテナンス履歴活用AI - プレゼンテーション</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #3b82f6;
+            --secondary-color: #64748b;
+            --accent-color: #06b6d4;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --text-primary: #ffffff;
+            --text-secondary: #e2e8f0;
+            --text-muted: #94a3b8;
+            --surface: rgba(255, 255, 255, 0.05);
+            --surface-hover: rgba(255, 255, 255, 0.1);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            padding: 4rem;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .slide.active {
+            display: flex;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            from { 
+                transform: translateX(100%); 
+                opacity: 0; 
+            }
+            to { 
+                transform: translateX(0); 
+                opacity: 1; 
+            }
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        p {
+            font-size: 1.3rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            font-weight: 400;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, var(--accent-color) 0%, var(--primary-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .problem-icon {
+            font-size: 6rem;
+            margin-bottom: 2rem;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            background: var(--surface-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            width: 100%;
+            max-width: 1400px;
+            margin: 2rem 0;
+        }
+
+        .before-after {
+            padding: 2rem;
+            border-radius: 15px;
+            border: 2px solid;
+        }
+
+        .before {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+        }
+
+        .after {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: #10b981;
+        }
+
+        .feature-list {
+            list-style: none;
+            font-size: 1.4rem;
+            line-height: 2;
+        }
+
+        .feature-list li {
+            margin-bottom: 1rem;
+            padding-left: 3rem;
+            position: relative;
+        }
+
+        .feature-list li::before {
+            content: "✅";
+            position: absolute;
+            left: 0;
+            font-size: 1.5rem;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, var(--accent-color), var(--primary-light));
+            color: white;
+            padding: 1rem 3rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(6, 182, 212, 0.4);
+            background: linear-gradient(135deg, var(--primary-light), var(--accent-color));
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 1rem;
+            z-index: 1000;
+        }
+
+        .nav-button {
+            background: var(--surface);
+            color: white;
+            border: 1px solid var(--border);
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-button:hover {
+            background: var(--surface-hover);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            background: var(--surface);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            border: 1px solid var(--border);
+        }
+
+        .roi-calculator {
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin: 2rem 0;
+            max-width: 600px;
+        }
+
+        .roi-input {
+            margin: 1rem 0;
+            display: block;
+            width: 100%;
+        }
+
+        .roi-input input {
+            padding: 0.8rem;
+            margin-left: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: var(--surface);
+            color: white;
+            transition: border-color 0.3s ease;
+        }
+
+        .roi-input input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+        }
+
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1000px;
+            margin: 2rem 0;
+        }
+
+        .timeline-item {
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .timeline-item:not(:last-child)::after {
+            content: "→";
+            position: absolute;
+            right: -2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            color: var(--accent-color);
+        }
+
+        .phase-box {
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin: 0 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .phase-box:hover {
+            background: var(--surface-hover);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 2rem;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            h2 {
+                font-size: 2rem;
+            }
+            
+            .stats-container,
+            .comparison-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .timeline {
+                flex-direction: column;
+            }
+            
+            .timeline-item:not(:last-child)::after {
+                content: "↓";
+                right: auto;
+                bottom: -1rem;
+                top: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <!-- スライド1: インパクトあるタイトル -->
+        <div class="slide active">
+            <h1 style="font-size: 4rem; margin-bottom: 1rem;">⚡ <span class="highlight">もう、夜中のトラブル対応で<br>眠れない夜は終わりです</span></h1>
+            <p class="subtitle" style="font-size: 2.2rem;">AIが24時間365日、あなたの代わりに<br>最適な対策を瞬時に見つけます</p>
+            <div style="margin-top: 3rem; padding: 2rem; background: var(--surface); border-radius: 12px; border: 1px solid var(--border);">
+                <p style="font-size: 1.8rem; color: var(--success-color);">✅ <strong>導入3ヶ月で平均86%の時間短縮を実現</strong></p>
+                <p style="font-size: 1.8rem; color: var(--success-color);">✅ <strong>年間2億円の損失を1,700万円まで削減</strong></p>
+                <p style="font-size: 1.8rem; color: var(--success-color);">✅ <strong>若手社員でもベテラン並みの対応が可能に</strong></p>
+            </div>
+            <p style="margin-top: 2rem; font-size: 1.1rem; opacity: 0.8;">スペースキーで実際の効果を確認 →</p>
+        </div>
+
+        <!-- スライド2: リアルな現場の声 -->
+        <div class="slide">
+            <h1 style="color: var(--danger-color);">😫 こんな経験、ありませんか？</h1>
+            <div class="comparison-container">
+                <div style="background: var(--surface); padding: 2rem; border-radius: 12px; border: 1px solid var(--danger-color);">
+                    <h2 style="color: var(--danger-color);">💬 現場の生の声</h2>
+                    <div style="text-align: left; font-size: 1.4rem; line-height: 1.8;">
+                        <p><strong>製造部長（52歳）：</strong><br>"深夜2時のアラーム...またこの設備か。ベテランの田中さんは退職したし、マニュアルはどこだっけ？"</p>
+                        <p><strong>メンテナンス担当（28歳）：</strong><br>"このエラーコード、前にも見たことがある気がするけど、対処法が思い出せない...上司に電話するしかないか"</p>
+                        <p><strong>工場長（45歳）：</strong><br>"1時間止まっただけで500万の損失。同じトラブルを繰り返すのは本当にもったいない"</p>
+                    </div>
+                </div>
+                <div style="background: var(--surface); padding: 2rem; border-radius: 12px; border: 1px solid var(--secondary-color);">
+                    <h2 style="color: var(--secondary-color);">📊 深刻な業界課題</h2>
+                    <ul style="font-size: 1.6rem; text-align: left; line-height: 2;">
+                        <li><strong>属人化リスク：</strong> ベテラン退職で技術が消失</li>
+                        <li><strong>対応遅延：</strong> 原因特定に平均2-4時間</li>
+                        <li><strong>再発防止困難：</strong> ナレッジが蓄積されない</li>
+                        <li><strong>コスト増大：</strong> 同じ問題を何度も解決</li>
+                        <li><strong>人材不足：</strong> 24時間対応できる人がいない</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド3: 衝撃的な損失額 -->
+        <div class="slide">
+            <h1>💸 あなたの会社の<span style="color: var(--danger-color);">隠れた巨額損失</span></h1>
+            <div style="background: var(--surface); padding: 3rem; margin: 2rem 0; border-radius: 12px; border: 1px solid var(--danger-color);">
+                <div class="stat-number" style="font-size: 5rem; color: var(--danger-color); text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">年間2億円</div>
+                <p style="font-size: 2rem; margin: 1rem 0;">設備トラブルによる機会損失</p>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 2rem;">
+                    <div>
+                        <div style="font-size: 2rem; color: var(--warning-color);">8,760時間</div>
+                        <p>年間稼働可能時間</p>
+                    </div>
+                    <div>
+                        <div style="font-size: 2rem; color: var(--warning-color);">400時間</div>
+                        <p>トラブル対応時間</p>
+                    </div>
+                    <div>
+                        <div style="font-size: 2rem; color: var(--warning-color);">4.5%</div>
+                        <p>生産性ロス率</p>
+                    </div>
+                </div>
+            </div>
+            <h2 style="color: var(--accent-color);">この損失の86%を削減できるとしたら...？</h2>
+            <p style="font-size: 1.8rem; margin-top: 1rem;"><strong>年間1億7,200万円の利益改善</strong> が可能です</p>
+        </div>
+
+        <!-- スライド4: 革新的ソリューション -->
+        <div class="slide">
+            <h1>🚀 <span class="highlight">革新的AI対策提案システム</span></h1>
+            <h2 style="margin-bottom: 3rem;">「メンテナンス履歴活用AI」</h2>
+            <div class="stats-container">
+                <div class="stat-card">
+                    <h3>🧠 超高速分析エンジン</h3>
+                    <p style="font-size: 1.4rem; margin: 1rem 0; color: var(--accent-color);"><strong>10万件+の過去事例を3秒で分析</strong></p>
+                    <p>あなたの工場の過去20年分のトラブル事例、類似工場のベストプラクティス、メーカー推奨対策を総合的に分析</p>
+                </div>
+                <div class="stat-card">
+                    <h3>🎯 予測精度95%の対策提案</h3>
+                    <p style="font-size: 1.4rem; margin: 1rem 0; color: var(--accent-color);"><strong>成功率順にランキング表示</strong></p>
+                    <p>機械学習により最も効果的な対策を予測。実際の成功率、所要時間、必要な部品まで詳細に提示</p>
+                </div>
+                <div class="stat-card">
+                    <h3>📱 直感的なインターフェース</h3>
+                    <p style="font-size: 1.4rem; margin: 1rem 0; color: var(--accent-color);"><strong>スマホでもタブレットでも操作可能</strong></p>
+                    <p>現場でも事務所でも、どこからでもアクセス。音声入力にも対応で、忙しい現場でも素早く操作</p>
+                </div>
+                <div class="stat-card">
+                    <h3>🔄 学習し続けるAI</h3>
+                    <p style="font-size: 1.4rem; margin: 1rem 0; color: var(--accent-color);"><strong>使うほど賢くなる</strong></p>
+                    <p>新しい対策結果を学習し、あなたの工場に特化した提案精度を向上。6ヶ月後には98%の精度を実現</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド5: 実際の導入事例 -->
+        <div class="slide">
+            <h1>📈 <span class="highlight">実際の導入事例</span></h1>
+            <h2 style="margin-bottom: 2rem;">大手自動車部品メーカーA社の場合</h2>
+            <div class="comparison-container">
+                <div style="background: var(--surface); padding: 2rem; border-radius: 12px; border: 1px solid var(--danger-color);">
+                    <h2 style="color: var(--danger-color);">😫 導入前の状況</h2>
+                    <div style="text-align: left; font-size: 1.3rem; line-height: 1.8;">
+                        <p><strong>🚨 月平均15回のライン停止</strong></p>
+                        <p>• 夜間対応で技術者が疲弊</p>
+                        <p>• 同じトラブルを繰り返し発生</p>
+                        <p>• 対応に平均3.5時間</p>
+                        <p>• ベテラン2名の退職で技術継承困難</p>
+                    </div>
+                    <div style="margin-top: 2rem; text-align: center;">
+                        <div class="stat-number" style="color: var(--danger-color); font-size: 2.5rem;">月間損失</div>
+                        <div class="stat-number" style="color: var(--danger-color); font-size: 3rem;">2,600万円</div>
+                    </div>
+                </div>
+                <div style="background: var(--surface); padding: 2rem; border-radius: 12px; border: 1px solid var(--success-color);">
+                    <h2 style="color: var(--success-color);">🎉 導入6ヶ月後</h2>
+                    <div style="text-align: left; font-size: 1.3rem; line-height: 1.8;">
+                        <p><strong>✅ 月平均2回のライン停止</strong></p>
+                        <p>• 対応時間が平均25分に短縮</p>
+                        <p>• 新人でも適切な対策を実行</p>
+                        <p>• 予防保全で事前対策も可能</p>
+                        <p>• 技術ノウハウの自動蓄積</p>
+                    </div>
+                    <div style="margin-top: 2rem; text-align: center;">
+                        <div class="stat-number" style="color: var(--success-color); font-size: 2.5rem;">月間損失</div>
+                        <div class="stat-number" style="color: var(--success-color); font-size: 3rem;">150万円</div>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 2rem; padding: 2rem; background: var(--surface); border-radius: 12px; border: 1px solid var(--border);">
+                <h2 style="color: var(--warning-color);">💰 実績：月間2,450万円の損失削減（94%改善）</h2>
+                <p style="font-size: 1.4rem;">「もっと早く導入すればよかった」- A社製造部長</p>
+            </div>
+        </div>
+
+        <!-- スライド6: システムデモ -->
+        <div class="slide">
+            <h1>💻 <span class="highlight">実際の操作画面</span></h1>
+            <h2 style="margin-bottom: 2rem;">トラブル発生から解決まで、わずか3ステップ</h2>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin: 2rem 0;">
+                <div class="stat-card">
+                    <h3 style="font-size: 2rem; margin-bottom: 1rem;">Step 1 📱</h3>
+                    <h4>症状入力（30秒）</h4>
+                    <div style="background: var(--surface-hover); color: var(--text-primary); padding: 1rem; border-radius: 8px; margin: 1rem 0; font-family: monospace; border: 1px solid var(--border);">
+                        エラーコード: E-4521<br>
+                        症状: 異常振動、温度上昇<br>
+                        設備: ライン3-プレス機A
+                    </div>
+                    <p>スマホでエラーコードを撮影するだけでも自動認識</p>
+                </div>
+                <div class="stat-card">
+                    <h3 style="font-size: 2rem; margin-bottom: 1rem;">Step 2 🤖</h3>
+                    <h4>AI分析・提案（10秒）</h4>
+                    <div style="background: var(--surface-hover); color: var(--text-primary); padding: 1rem; border-radius: 8px; margin: 1rem 0; font-size: 0.9rem; border: 1px solid var(--border);">
+                        <strong>推奨対策</strong><br>
+                        1位: ベアリング交換 (成功率98%)<br>
+                        2位: 潤滑油補充 (成功率85%)<br>
+                        3位: センサー清掃 (成功率70%)
+                    </div>
+                    <p>過去の類似事例127件から最適解を選出</p>
+                </div>
+                <div class="stat-card">
+                    <h3 style="font-size: 2rem; margin-bottom: 1rem;">Step 3 ⚡</h3>
+                    <h4>対策実行（20分）</h4>
+                    <div style="background: var(--surface-hover); color: var(--text-primary); padding: 1rem; border-radius: 8px; margin: 1rem 0; font-size: 0.9rem; border: 1px solid var(--border);">
+                        <strong>詳細手順</strong><br>
+                        • 必要工具: トルクレンチ<br>
+                        • 作業時間: 約20分<br>
+                        • 注意点: 電源OFF必須
+                    </div>
+                    <p>動画付きマニュアルで新人でも安心</p>
+                </div>
+            </div>
+            <div style="background: var(--surface); padding: 2rem; border-radius: 12px; border: 1px solid var(--success-color); margin-top: 2rem;">
+                <h2>⏰ 従来4時間 → <span style="color: var(--success-color);">AI活用30分</span> （92%短縮）</h2>
+            </div>
+        </div>
+
+        <!-- スライド7: インタラクティブROI計算 -->
+        <div class="slide">
+            <h1>💰 <span class="highlight">あなたの会社の削減効果</span></h1>
+            <h2 style="margin-bottom: 2rem;">実際の数値で効果を実感してください</h2>
+            <div class="roi-calculator" style="max-width: 800px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                    <label class="roi-input" style="font-size: 1.4rem;">
+                        <strong>年間設備トラブル回数:</strong>
+                        <input type="number" id="troubleCount" value="50" style="padding: 1rem; font-size: 1.2rem; width: 100%; margin-top: 0.5rem;">
+                    </label>
+                    <label class="roi-input" style="font-size: 1.4rem;">
+                        <strong>1回あたりの損失額（万円):</strong>
+                        <input type="number" id="lossAmount" value="500" style="padding: 1rem; font-size: 1.2rem; width: 100%; margin-top: 0.5rem;">
+                    </label>
+                </div>
+                <button class="cta-button" onclick="calculateCustomROI()" style="font-size: 1.4rem; padding: 1.2rem 3rem;">💡 削減効果を計算する</button>
+                <div id="roiResult" style="display:none; margin-top: 3rem; padding: 2rem; background: var(--surface); border-radius: 12px; border: 1px solid var(--success-color);">
+                    <h2 style="color: var(--success-color); margin-bottom: 2rem;">🎉 あなたの会社の改善効果</h2>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 2.5rem; font-weight: bold; color: var(--success-color);"><span id="annualSaving"></span>万円</div>
+                            <p style="color: var(--text-secondary);">年間削減額</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 2.5rem; font-weight: bold; color: var(--warning-color);"><span id="paybackPeriod"></span>ヶ月</div>
+                            <p style="color: var(--text-secondary);">投資回収期間</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 2.5rem; font-weight: bold; color: var(--accent-color);"><span id="roiPercentage"></span>%</div>
+                            <p style="color: var(--text-secondary);">投資収益率</p>
+                        </div>
+                    </div>
+                    <p style="color: var(--text-primary); font-size: 1.3rem; margin-top: 2rem; text-align: center;">
+                        <strong>この効果を1ヶ月以内に実現できます</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド8: 簡単導入プロセス -->
+        <div class="slide">
+            <h1>🚀 <span class="highlight">驚くほど簡単な導入プロセス</span></h1>
+            <h2 style="margin-bottom: 3rem;">わずか30日で効果を実感</h2>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; margin: 3rem 0;">
+                <div class="stat-card" style="padding: 2.5rem; text-align: center;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">📋</div>
+                    <h3 style="font-size: 1.8rem; margin-bottom: 1rem;">Step 1: 無料診断</h3>
+                    <p style="font-size: 1.3rem; line-height: 1.6;">現在のトラブル状況をヒアリング。過去データを分析し、削減効果を算出</p>
+                    <div style="margin-top: 1.5rem; padding: 1rem; background: var(--surface-hover); border-radius: 8px; border: 1px solid var(--border);">
+                        <strong>所要時間: 2時間</strong>
+                    </div>
+                </div>
+                <div class="stat-card" style="padding: 2.5rem; text-align: center;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">⚙️</div>
+                    <h3 style="font-size: 1.8rem; margin-bottom: 1rem;">Step 2: システム構築</h3>
+                    <p style="font-size: 1.3rem; line-height: 1.6;">お客様のシステムに合わせてカスタマイズ。データ移行も自動化で安心</p>
+                    <div style="margin-top: 1.5rem; padding: 1rem; background: var(--surface-hover); border-radius: 8px; border: 1px solid var(--border);">
+                        <strong>所要時間: 2週間</strong>
+                    </div>
+                </div>
+                <div class="stat-card" style="padding: 2.5rem; text-align: center;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">🎯</div>
+                    <h3 style="font-size: 1.8rem; margin-bottom: 1rem;">Step 3: 運用開始</h3>
+                    <p style="font-size: 1.3rem; line-height: 1.6;">専任サポートが操作方法を指導。運用開始と同時に効果を実感</p>
+                    <div style="margin-top: 1.5rem; padding: 1rem; background: var(--surface-hover); border-radius: 8px; border: 1px solid var(--border);">
+                        <strong>所要時間: 1週間</strong>
+                    </div>
+                </div>
+            </div>
+            <div style="background: var(--surface); padding: 2rem; border-radius: 12px; border: 1px solid var(--success-color); margin-top: 2rem;">
+                <h2>🎉 導入30日後には平均86%の時間短縮を実現</h2>
+                <p style="font-size: 1.4rem; margin-top: 1rem;">「設定がこんなに簡単だとは思わなかった」- 導入企業様の声</p>
+            </div>
+        </div>
+
+        <!-- スライド9: 充実のサポート体制 -->
+        <div class="slide">
+            <h1>🤝 <span class="highlight">安心の充実サポート</span></h1>
+            <h2 style="margin-bottom: 3rem;">導入から運用まで、専門チームが完全サポート</h2>
+            <div class="stats-container">
+                <div class="stat-card">
+                    <h3>📞 24時間365日サポート</h3>
+                    <p style="margin: 1rem 0;">夜間トラブルでも安心。専門エンジニアが即座に対応</p>
+                    <ul style="text-align: left; font-size: 1.2rem;">
+                        <li>電話サポート: 24時間対応</li>
+                        <li>リモート支援: 画面共有で直接解決</li>
+                        <li>現地派遣: 緊急時は2時間以内</li>
+                    </ul>
+                </div>
+                <div class="stat-card">
+                    <h3>🎓 充実の研修プログラム</h3>
+                    <p style="margin: 1rem 0;">全社員が使いこなせるまで丁寧に指導</p>
+                    <ul style="text-align: left; font-size: 1.2rem;">
+                        <li>導入時研修: 2日間の集中講座</li>
+                        <li>定期研修: 月1回のスキルアップ</li>
+                        <li>個別指導: 不明点は1対1で解決</li>
+                    </ul>
+                </div>
+                <div class="stat-card">
+                    <h3>🔧 継続的システム改善</h3>
+                    <p style="margin: 1rem 0;">お客様の要望に応じてカスタマイズ</p>
+                    <ul style="text-align: left; font-size: 1.2rem;">
+                        <li>月次レビュー: 効果測定と改善提案</li>
+                        <li>機能追加: 新しいニーズに対応</li>
+                        <li>バージョンアップ: 無償で最新機能提供</li>
+                    </ul>
+                </div>
+                <div class="stat-card">
+                    <h3>💰 成果保証制度</h3>
+                    <p style="margin: 1rem 0;">効果が出なければ全額返金</p>
+                    <ul style="text-align: left; font-size: 1.2rem;">
+                        <li>効果保証: 3ヶ月で50%以上改善</li>
+                        <li>満足保証: 30日間無条件返金</li>
+                        <li>成果報酬: 追加効果に応じて料金調整</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド10: 強力なCall to Action -->
+        <div class="slide">
+            <h1>⚡ <span class="highlight">今すぐ始めて、明日から効果を実感</span></h1>
+            <div style="background: var(--surface); padding: 3rem; border-radius: 12px; margin: 2rem 0; border: 1px solid var(--warning-color);">
+                <h2 style="font-size: 2.5rem; margin-bottom: 2rem; color: var(--warning-color);">🎁 限定特典付き無料トライアル</h2>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; margin: 2rem 0;">
+                    <div>
+                        <h3 style="color: var(--text-primary); font-size: 1.8rem;">✅ 完全無料体験（30日間）</h3>
+                        <p style="font-size: 1.3rem; color: var(--text-secondary);">リスクゼロで効果を実感</p>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--text-primary); font-size: 1.8rem;">✅ 専任コンサルタント配置</h3>
+                        <p style="font-size: 1.3rem; color: var(--text-secondary);">導入から運用まで完全サポート</p>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--text-primary); font-size: 1.8rem;">✅ 投資効果レポート作成</h3>
+                        <p style="font-size: 1.3rem; color: var(--text-secondary);">具体的な削減効果を数値で提示</p>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--text-primary); font-size: 1.8rem;">✅ 導入費用50%OFF</h3>
+                        <p style="font-size: 1.3rem; color: var(--text-secondary);">今月限定の特別価格</p>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: center; margin: 3rem 0;">
+                <a href="tel:0120-XXX-XXX" class="cta-button" style="font-size: 1.6rem; padding: 1.5rem 4rem; margin: 1rem;">📞 今すぐ電話で相談</a>
+                <a href="mailto:info@smart-manufacturing.com" class="cta-button" style="font-size: 1.6rem; padding: 1.5rem 4rem; margin: 1rem;">✉️ メールで詳細資料請求</a>
+            </div>
+            <div style="background: var(--surface); padding: 2rem; border-radius: 12px; border: 1px solid var(--border);">
+                <h2 style="color: var(--success-color); font-size: 2rem;">⏰ 今月中のお申し込みで、追加特典をプレゼント</h2>
+                <p style="font-size: 1.5rem; margin-top: 1rem;">「1年後、この決断が会社を変えた瞬間だったと振り返るはずです」</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ナビゲーション -->
+    <div class="navigation">
+        <button class="nav-button" onclick="previousSlide()">◀ 前へ</button>
+        <button class="nav-button" onclick="nextSlide()">次へ ▶</button>
+        <button class="nav-button" onclick="toggleFullscreen()">フルスクリーン</button>
+    </div>
+
+    <!-- スライドカウンター -->
+    <div class="slide-counter">
+        <span id="currentSlide">1</span> / <span id="totalSlides">10</span>
+    </div>
+
+    <script>
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[index].classList.add('active');
+            document.getElementById('currentSlide').textContent = index + 1;
+        }
+
+        function nextSlide() {
+            if (currentSlideIndex < totalSlides - 1) {
+                currentSlideIndex++;
+                showSlide(currentSlideIndex);
+            }
+        }
+
+        function previousSlide() {
+            if (currentSlideIndex > 0) {
+                currentSlideIndex--;
+                showSlide(currentSlideIndex);
+            }
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function calculateCustomROI() {
+            const troubleCount = parseInt(document.getElementById('troubleCount').value) || 0;
+            const lossAmount = parseInt(document.getElementById('lossAmount').value) || 0;
+            
+            const annualLoss = troubleCount * lossAmount;
+            const reduction = Math.round(annualLoss * 0.86);
+            const systemCost = 1000;
+            
+            const payback = (systemCost / (reduction / 12)).toFixed(1);
+            const roi = Math.round(((reduction - systemCost) / systemCost) * 100);
+            
+            document.getElementById('annualSaving').textContent = reduction.toLocaleString();
+            document.getElementById('paybackPeriod').textContent = payback;
+            document.getElementById('roiPercentage').textContent = roi;
+            document.getElementById('roiResult').style.display = 'block';
+        }
+
+        // キーボードナビゲーション
+        document.addEventListener('keydown', function(e) {
+            switch(e.key) {
+                case 'ArrowRight':
+                case ' ':
+                    e.preventDefault();
+                    nextSlide();
+                    break;
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    previousSlide();
+                    break;
+                case 'f':
+                case 'F11':
+                    e.preventDefault();
+                    toggleFullscreen();
+                    break;
+                case 'Home':
+                    e.preventDefault();
+                    currentSlideIndex = 0;
+                    showSlide(currentSlideIndex);
+                    break;
+                case 'End':
+                    e.preventDefault();
+                    currentSlideIndex = totalSlides - 1;
+                    showSlide(currentSlideIndex);
+                    break;
+            }
+        });
+
+        // 初期表示
+        showSlide(0);
+
+        // 自動プレゼンテーション機能（オプション）
+        function startAutoPresentation() {
+            const interval = setInterval(() => {
+                if (currentSlideIndex < totalSlides - 1) {
+                    nextSlide();
+                } else {
+                    clearInterval(interval);
+                }
+            }, 15000); // 15秒間隔
+            return interval;
+        }
+
+        // 'a'キーで自動プレゼン開始
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'a' || e.key === 'A') {
+                startAutoPresentation();
+            }
+        });
+    </script>
+</body>
+</html>
